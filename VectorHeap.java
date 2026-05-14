@@ -16,6 +16,57 @@ public class VectorHeap<E extends Comparable<E>> implements PriorityQueue<E> {
     public void clear() { data.clear(); }
     public E getFirst() { return data.get(0); }
     
-    public void add(E value) {}
-    public E remove() { return null; }
+    /**
+     * Agrega un valor al Heap y lo ubica en su posicion correcta.
+     */
+    @Override
+    public void add(E value) {
+        data.add(value);
+        percolateUp(data.size() - 1);
+    }
+
+    protected void percolateUp(int leaf) {
+        int parent = parent(leaf);
+        E value = data.get(leaf);
+        while (leaf > 0 && (value.compareTo(data.get(parent)) < 0)) {
+            data.set(leaf, data.get(parent));
+            leaf = parent;
+            parent = parent(leaf);
+        }
+        data.set(leaf, value);
+    }
+    
+    @Override
+    public E remove() {
+        E minVal = getFirst();
+        data.set(0, data.get(data.size() - 1));
+        data.setSize(data.size() - 1);
+        if (data.size() > 1) {
+            pushDownRoot(0);
+        }
+        return minVal;
+    }
+
+    protected void pushDownRoot(int root) {
+        int heapSize = data.size();
+        E value = data.get(root);
+        while (root < heapSize) {
+            int childpos = left(root);
+            if (childpos < heapSize) {
+                if ((right(root) < heapSize) && ((data.get(childpos + 1)).compareTo(data.get(childpos)) < 0)) {
+                    childpos++;
+                }
+                if ((data.get(childpos)).compareTo(value) < 0) {
+                    data.set(root, data.get(childpos));
+                    root = childpos;
+                } else {
+                    data.set(root, value);
+                    return;
+                }
+            } else {
+                data.set(root, value);
+                return;
+            }
+        }
+    }
 }
